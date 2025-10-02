@@ -10,7 +10,7 @@ pthread_barrier_t barrier;
 struct ParamThread {
     int* arr;
     int size;
-    int thread_num;
+    pthread_t thread_num;
 };
 
 int compare(const void *a, const void *b) {
@@ -22,13 +22,14 @@ int random(int min, int max){
 }
 
 void merge(){
-
+    
+    int max_size = 0;
+    
 }   
 
 void * sort_thr(void *arg){
     struct ParamThread* param_thread = (struct ParamThread*)arg;
 
-    printf("ss");
     clock_t start, end;
     double cpu_time;
 
@@ -37,10 +38,6 @@ void * sort_thr(void *arg){
     start = clock();
 
     end = clock();
-
-    for(int i = 0; i < 100; i++){
-        printf("%d\n", param_thread->arr[i]);
-    }
 
     cpu_time = ((double) (end - start)) / CLOCKS_PER_SEC;
     printf("Поток %d отсортировал массива за %.6f секунд\n", param_thread->thread_num, cpu_time);
@@ -60,8 +57,6 @@ int main(){
     int size_arr_2 = random(89999,99999);
     int size_arr_3 = random(10000,34000);
     int size_arr_4 = random(1000,2000);
-
-    printf("size %d\n", size_arr_1);
 
     int* arr1 = malloc(size_arr_1  * sizeof(int));
     if (arr1 == NULL) {
@@ -85,8 +80,6 @@ int main(){
         {arr4, size_arr_4, 4},
     };
 
-    printf("%d",  sizeof(params_thread[0].arr) / sizeof(int));  
-
     //pthread_barrier_wait();
 
     //qsort(arr1, sizeof(arr1) / sizeof(arr1[0]), sizeof(int), compare_int);
@@ -98,7 +91,7 @@ int main(){
     //printf("Массив 4 %d \n", sizeof(params_thread[3].arr) / sizeof(int));
     //printf("\n");
 
-    if (pthread_barrier_init(&barrier, NULL, 4) != 0) {
+    if (pthread_barrier_init(&barrier, NULL, 5) != 0) {
         printf("Ошибка инициализации барьера\n");
         return 1;
     }
@@ -118,7 +111,12 @@ int main(){
 
     //pthread_join(&params_thread[0].thread_num, NULL);
 
-    //  pthread_barrier_destroy(&barrier);
+    pthread_barrier_destroy(&barrier);
+
+    free(arr1);
+    free(arr2);
+    free(arr3);
+    free(arr4);
+
     return 0;
-    
 }
