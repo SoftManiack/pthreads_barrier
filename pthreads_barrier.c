@@ -13,18 +13,64 @@ struct ParamThread {
     pthread_t thread_num;
 };
 
+int size_params = 0;
+
 int compare(const void *a, const void *b) {
     return (*(int*)a - *(int*)b);
 }
 
 int random(int min, int max){
-    return min + rand() % ( max - min + 1);
+    return min + rand() % ( max - min + 1);                                                             
 }
 
-void merge(){
+int* merge(struct ParamThread* params)
+{
     
-    int max_size = 0;
-    
+    int merge_size = 0;
+    int max_size = params[0].size;
+    int* merge_arr = malloc(merge_size * sizeof(int));
+    int* arr_indexes = malloc(size_params * sizeof(int));
+
+    for(int i = 0; i < size_params; i++){
+        merge_size += params[i].size;
+    }   
+
+    for(int i = 0; i < size_params; i++){
+
+        if(params[i].size < max_size){
+            max_size = params[i].size;
+        }
+    }
+
+    int merge_arr_index = 0;
+
+    for(int i = 0; i < merge_size; i++) {
+        merge_arr[i] = 0;
+
+        int current_num = 0;
+
+
+    }
+
+    //for(int i = 0; i){
+    //
+    //}
+
+    // [1,1,1,2,3,4,5]
+    // [1,2,2,3,4,4,4]
+    // [1,1,1,2,2,2,8]
+    // [10,11,100,111,111,111,111]
+
+    // 1-1 2-1 3-1 4-2
+    // 1-1 
+    // 1-1 2-1 3-1
+
+    // 1-1 2-1 3-1 4-1 5-1 6-1 7-1 8-2
+
+
+    // [1],[]
+
+    return merge_arr;
 }   
 
 void * sort_thr(void *arg){
@@ -73,6 +119,8 @@ int main(){
     for(int i = 0; i < size_arr_3; i++) arr3[i] = random(1,999);
     for(int i = 0; i < size_arr_4; i++) arr4[i] = random(1,999);
 
+    int size_params = 4;
+
     struct ParamThread params_thread[4] = {
         {arr1, size_arr_1, 1},
         {arr2, size_arr_2, 2},
@@ -80,16 +128,6 @@ int main(){
         {arr4, size_arr_4, 4},
     };
 
-    //pthread_barrier_wait();
-
-    //qsort(arr1, sizeof(arr1) / sizeof(arr1[0]), sizeof(int), compare_int);
-    //qsort(arr2, sizeof(arr2) / sizeof(arr2[0]), sizeof(int), compare_int);
-
-    //printf("Массив 1 %d \n", sizeof(params_thread[0].arr) / sizeof(int));
-    //printf("Массив 2 %d \n", sizeof(params_thread[1].arr) / sizeof(int));
-    //printf("Массив 3 %d \n", sizeof(params_thread[2].arr) / sizeof(int));
-    //printf("Массив 4 %d \n", sizeof(params_thread[3].arr) / sizeof(int));
-    //printf("\n");
 
     if (pthread_barrier_init(&barrier, NULL, 5) != 0) {
         printf("Ошибка инициализации барьера\n");
@@ -110,6 +148,7 @@ int main(){
     //merge();
 
     //pthread_join(&params_thread[0].thread_num, NULL);
+    merge(params_thread);
 
     pthread_barrier_destroy(&barrier);
 
