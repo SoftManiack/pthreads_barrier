@@ -13,7 +13,9 @@ struct ParamThread {
     pthread_t thread_num;
 };
 
-int size_params = 0;
+struct ParamThread* params;
+int size_params;
+int* merge_arr_indexes;
 
 int compare(const void *a, const void *b) {
     return (*(int*)a - *(int*)b);
@@ -23,17 +25,42 @@ int random(int min, int max){
     return min + rand() % ( max - min + 1);                                                             
 }
 
+int search_new_min_num(struct ParamThread* params){
+    
+    int new_min = merge_arr_indexes[0];
+    for(int i = 0; i > size_params; i++){
+        if(merge_arr_indexes[i] < new_min ){
+            new_min = merge_arr_indexes[i];
+        }
+    }
+
+    return new_min;
+}
+
 int* merge(struct ParamThread* params)
 {
     
     int merge_size = 0;
     int max_size = params[0].size;
-    int* merge_arr = malloc(merge_size * sizeof(int));
-    int* arr_indexes = malloc(size_params * sizeof(int));
+    int* merge_arr;
+    merge_arr_indexes = malloc(size_params * sizeof(int));
+
+    printf("size_params: %d\n", size_params);
+    printf("max_size: %d\n", max_size);
+
+    printf("merge_arr_indexes: %d\n", merge_arr_indexes[0]);
+
+    for(int i = 0; i < size_params; i++){
+        merge_arr_indexes[i] = 0;
+    }
 
     for(int i = 0; i < size_params; i++){
         merge_size += params[i].size;
     }   
+
+    merge_arr = malloc(merge_size * sizeof(int));
+
+    printf("merge_size: %d\n", merge_size);
 
     for(int i = 0; i < size_params; i++){
 
@@ -44,31 +71,45 @@ int* merge(struct ParamThread* params)
 
     int merge_arr_index = 0;
 
-    for(int i = 0; i < merge_size; i++) {
-        merge_arr[i] = 0;
+    int current_num = 0;
+    int min_num = 0;
 
-        int current_num = 0;
-
-
+    for(int i = 0; i > size_params; i++){
+        if(min_num< merge_arr_indexes[0]) {
+            min_num = merge_arr_indexes[0];
+        } 
     }
 
-    //for(int i = 0; i){
-    //
-    //}
+    printf("min_num: %d\n", min_num);
 
-    // [1,1,1,2,3,4,5]
-    // [1,2,2,3,4,4,4]
-    // [1,1,1,2,2,2,8]
-    // [10,11,100,111,111,111,111]
+    for(int i = 0; i < size_params; i++){
 
-    // 1-1 2-1 3-1 4-2
-    // 1-1 
-    // 1-1 2-1 3-1
+        if(merge_arr_indexes[i] < params[i].size){
+            
+            for(int j = merge_arr_indexes[i]; j < params[i].size; j++){
+                if(min_num == params[i].arr[j]){
+                    merge_arr_index++;
+                    merge_arr_indexes[i] += 1;
+                    merge_arr[merge_arr_index] = params[i].arr[j];
+                }
 
-    // 1-1 2-1 3-1 4-1 5-1 6-1 7-1 8-2
+                if(min_num < params[i].arr[j] &&  i == size_params){
+                    min_num = search_new_min_num(params);
+                }
 
+                if(merge_arr_index == merge_size - 1){
+                    break;
+                }
+            }
 
-    // [1],[]
+        }
+    }
+
+    for(int i = 0; i < merge_size; i++){
+        printf("%d, ", merge_arr[i]);
+    }
+
+    printf("\n");
 
     return merge_arr;
 }   
@@ -99,10 +140,10 @@ int main(){
 
     // создать массив чисел для сортировки
 
-    int size_arr_1 = random(8899,9000);
-    int size_arr_2 = random(89999,99999);
-    int size_arr_3 = random(10000,34000);
-    int size_arr_4 = random(1000,2000);
+    int size_arr_1 = random(1,4);
+    int size_arr_2 = random(1,4);
+    int size_arr_3 = random(1,4);
+    int size_arr_4 = random(1,4);
 
     int* arr1 = malloc(size_arr_1  * sizeof(int));
     if (arr1 == NULL) {
@@ -114,12 +155,21 @@ int main(){
     int* arr3 = malloc(size_arr_3  * sizeof(int));
     int* arr4 = malloc(size_arr_4  * sizeof(int));
 
-    for(int i = 0; i < size_arr_1; i++) arr1[i] = random(1,999);
-    for(int i = 0; i < size_arr_2; i++) arr2[i] = random(1,999);
-    for(int i = 0; i < size_arr_3; i++) arr3[i] = random(1,999);
-    for(int i = 0; i < size_arr_4; i++) arr4[i] = random(1,999);
+    for(int i = 0; i < size_arr_1; i++) arr1[i] = random(1,1);
+    for(int i = 0; i < size_arr_2; i++) arr2[i] = random(1,2);
+    for(int i = 0; i < size_arr_3; i++) arr3[i] = random(1,3);
+    for(int i = 0; i < size_arr_4; i++) arr4[i] = random(1,1);
 
-    int size_params = 4;
+    size_params = 4;
+
+    
+    for(int i = 0; i < size_arr_1; i++){
+        printf("элемент массива 1: %d\n", arr1[i]);
+    }
+
+    for(int i = 0; i < size_arr_2; i++){
+        printf("элемент массива 2: %d\n", arr2[i]);
+    }
 
     struct ParamThread params_thread[4] = {
         {arr1, size_arr_1, 1},
