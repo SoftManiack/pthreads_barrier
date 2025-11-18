@@ -27,13 +27,13 @@ int random(int min, int max){
 
 int search_new_min_num(struct ParamThread* params){
     
-    int new_min = merge_arr_indexes[0];
-    for(int i = 0; i > size_params; i++){
-        if(merge_arr_indexes[i] < new_min ){
-            new_min = merge_arr_indexes[i];
+    int new_min = params[0].arr[merge_arr_indexes[0]];
+    for(int i = 0; i < size_params; i++){
+        if(params[i].arr[merge_arr_indexes[i]] < new_min ){
+            new_min = params[i].arr[merge_arr_indexes[i]];
         }
     }
-
+    
     return new_min;
 }
 
@@ -43,68 +43,68 @@ int* merge(struct ParamThread* params)
     int merge_size = 0;
     int max_size = params[0].size;
     int* merge_arr;
+
+    // создание merge_arr_indexes тут хранится index min наченияя каждого массива
     merge_arr_indexes = malloc(size_params * sizeof(int));
 
     printf("size_params: %d\n", size_params);
     printf("max_size: %d\n", max_size);
 
-    printf("merge_arr_indexes: %d\n", merge_arr_indexes[0]);
-
     for(int i = 0; i < size_params; i++){
         merge_arr_indexes[i] = 0;
     }
 
+    // создание merge_arr куда сольются все значения из массивов
     for(int i = 0; i < size_params; i++){
         merge_size += params[i].size;
     }   
-
+    
     merge_arr = malloc(merge_size * sizeof(int));
 
-    printf("merge_size: %d\n", merge_size);
-
+    // получить длинну саммог большого массива
     for(int i = 0; i < size_params; i++){
 
-        if(params[i].size < max_size){
+        if(params[i].size > max_size){
             max_size = params[i].size;
         }
     }
 
-    int merge_arr_index = 0;
-
-    int current_num = 0;
-    int min_num = 0;
-
-    for(int i = 0; i > size_params; i++){
-        if(min_num< merge_arr_indexes[0]) {
-            min_num = merge_arr_indexes[0];
-        } 
-    }
-
-    printf("min_num: %d\n", min_num);
+    // вывод длинны масссива и всех кго значений
 
     for(int i = 0; i < size_params; i++){
 
-        if(merge_arr_indexes[i] < params[i].size){
-            
-            for(int j = merge_arr_indexes[i]; j < params[i].size; j++){
-                if(min_num == params[i].arr[j]){
-                    merge_arr_index++;
-                    merge_arr_indexes[i] += 1;
-                    merge_arr[merge_arr_index] = params[i].arr[j];
-                }
+        printf(" Массив %d размер %d\n", i, params[i].size);
 
-                if(min_num < params[i].arr[j] &&  i == size_params){
-                    min_num = search_new_min_num(params);
-                }
-
-                if(merge_arr_index == merge_size - 1){
-                    break;
-                }
-            }
-
+        for(int j = 0; j < params[i].size; j++){
+            printf("%d ,", params[i].arr[j]);
         }
-    }
 
+        printf("\n");
+    }   
+
+    // max_size
+
+    printf("max_size: %d\n", max_size );
+
+    // вывод merge_arr
+
+    // вывод merger_arr_indexes
+
+    printf("merge_arr_indexes: %d\n", merge_arr_indexes[0]);
+    printf("merge_arr_indexes: %d\n", merge_arr_indexes[1]);
+    printf("merge_arr_indexes: %d\n", merge_arr_indexes[2]);
+    printf("merge_arr_indexes: %d\n", merge_arr_indexes[3]);
+
+    // вывод min
+
+    int min_num = search_new_min_num(params);
+
+    int merge_arr_index = 0;
+
+
+    printf("min_num: %d\n", min_num);
+
+    printf("слитый массив\n");
     for(int i = 0; i < merge_size; i++){
         printf("%d, ", merge_arr[i]);
     }
@@ -155,10 +155,10 @@ int main(){
     int* arr3 = malloc(size_arr_3  * sizeof(int));
     int* arr4 = malloc(size_arr_4  * sizeof(int));
 
-    for(int i = 0; i < size_arr_1; i++) arr1[i] = random(1,1);
-    for(int i = 0; i < size_arr_2; i++) arr2[i] = random(1,2);
+    for(int i = 0; i < size_arr_1; i++) arr1[i] = random(2,6);
+    for(int i = 0; i < size_arr_2; i++) arr2[i] = random(1,3);
     for(int i = 0; i < size_arr_3; i++) arr3[i] = random(1,3);
-    for(int i = 0; i < size_arr_4; i++) arr4[i] = random(1,1);
+    for(int i = 0; i < size_arr_4; i++) arr4[i] = random(1,5);
 
     size_params = 4;
 
@@ -169,6 +169,14 @@ int main(){
 
     for(int i = 0; i < size_arr_2; i++){
         printf("элемент массива 2: %d\n", arr2[i]);
+    }
+
+    for(int i = 0; i < size_arr_3; i++){
+        printf("элемент массива 3: %d\n", arr3[i]);
+    }
+
+    for(int i = 0; i < size_arr_4; i++){
+        printf("элемент массива 4: %d\n", arr4[i]);
     }
 
     struct ParamThread params_thread[4] = {
