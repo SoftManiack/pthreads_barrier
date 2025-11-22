@@ -26,14 +26,15 @@ int random(int min, int max){
 }
 
 int search_new_min_num(struct ParamThread* params){
-    
-    int new_min = params[0].arr[merge_arr_indexes[0]];
+        
+    int new_min = 10000000;
+
     for(int i = 0; i < size_params; i++){
-        if(params[i].arr[merge_arr_indexes[i]] < new_min ){
+        if(params[i].arr[merge_arr_indexes[i]] < new_min && merge_arr_indexes[i] < params[i].size ){
             new_min = params[i].arr[merge_arr_indexes[i]];
         }
     }
-    
+
     return new_min;
 }
 
@@ -46,9 +47,6 @@ int* merge(struct ParamThread* params)
 
     // создание merge_arr_indexes тут хранится index min наченияя каждого массива
     merge_arr_indexes = malloc(size_params * sizeof(int));
-
-    printf("size_params: %d\n", size_params);
-    printf("max_size: %d\n", max_size);
 
     for(int i = 0; i < size_params; i++){
         merge_arr_indexes[i] = 0;
@@ -69,47 +67,30 @@ int* merge(struct ParamThread* params)
         }
     }
 
-    // вывод длинны масссива и всех кго значений
-
-    for(int i = 0; i < size_params; i++){
-
-        printf(" Массив %d размер %d\n", i, params[i].size);
-
-        for(int j = 0; j < params[i].size; j++){
-            printf("%d ,", params[i].arr[j]);
-        }
-
-        printf("\n");
-    }   
-
-    // max_size
-
-    printf("max_size: %d\n", max_size );
-
-    // вывод merge_arr
-
-    // вывод merger_arr_indexes
-
-    printf("merge_arr_indexes: %d\n", merge_arr_indexes[0]);
-    printf("merge_arr_indexes: %d\n", merge_arr_indexes[1]);
-    printf("merge_arr_indexes: %d\n", merge_arr_indexes[2]);
-    printf("merge_arr_indexes: %d\n", merge_arr_indexes[3]);
-
-    // вывод min
-
     int min_num = search_new_min_num(params);
 
     int merge_arr_index = 0;
 
+    //merge_arr_index
 
-    printf("min_num: %d\n", min_num);
+    while(merge_arr_index != merge_size){
 
-    printf("слитый массив\n");
-    for(int i = 0; i < merge_size; i++){
-        printf("%d, ", merge_arr[i]);
+        min_num = search_new_min_num(params);
+        
+        for(int j = 0; j < size_params; j++){
+        
+            for(int k = merge_arr_indexes[j]; k < params[j].size; k++){
+                
+               if(params[j].arr[k] == min_num){
+
+                    merge_arr_indexes[j] += 1;
+                    merge_arr[merge_arr_index] = params[j].arr[k];
+                    merge_arr_index++;
+                    
+                }
+            }
+        }
     }
-
-    printf("\n");
 
     return merge_arr;
 }   
@@ -140,10 +121,10 @@ int main(){
 
     // создать массив чисел для сортировки
 
-    int size_arr_1 = random(1,4);
-    int size_arr_2 = random(1,4);
-    int size_arr_3 = random(1,4);
-    int size_arr_4 = random(1,4);
+    int size_arr_1 = random(1,18);
+    int size_arr_2 = random(1,20);
+    int size_arr_3 = random(1,24);
+    int size_arr_4 = random(1,12);
 
     int* arr1 = malloc(size_arr_1  * sizeof(int));
     if (arr1 == NULL) {
@@ -155,29 +136,12 @@ int main(){
     int* arr3 = malloc(size_arr_3  * sizeof(int));
     int* arr4 = malloc(size_arr_4  * sizeof(int));
 
-    for(int i = 0; i < size_arr_1; i++) arr1[i] = random(2,6);
+    for(int i = 0; i < size_arr_1; i++) arr1[i] = random(2,50);
     for(int i = 0; i < size_arr_2; i++) arr2[i] = random(1,3);
-    for(int i = 0; i < size_arr_3; i++) arr3[i] = random(1,3);
-    for(int i = 0; i < size_arr_4; i++) arr4[i] = random(1,5);
+    for(int i = 0; i < size_arr_3; i++) arr3[i] = random(1,333);
+    for(int i = 0; i < size_arr_4; i++) arr4[i] = random(1,29);
 
     size_params = 4;
-
-    
-    for(int i = 0; i < size_arr_1; i++){
-        printf("элемент массива 1: %d\n", arr1[i]);
-    }
-
-    for(int i = 0; i < size_arr_2; i++){
-        printf("элемент массива 2: %d\n", arr2[i]);
-    }
-
-    for(int i = 0; i < size_arr_3; i++){
-        printf("элемент массива 3: %d\n", arr3[i]);
-    }
-
-    for(int i = 0; i < size_arr_4; i++){
-        printf("элемент массива 4: %d\n", arr4[i]);
-    }
 
     struct ParamThread params_thread[4] = {
         {arr1, size_arr_1, 1},
@@ -203,12 +167,8 @@ int main(){
 
     printf("все потоки завершенны \n");
 
-    //merge();
-
-    //pthread_join(&params_thread[0].thread_num, NULL);
-    merge(params_thread);
-
     pthread_barrier_destroy(&barrier);
+    merge(params_thread);
 
     free(arr1);
     free(arr2);
